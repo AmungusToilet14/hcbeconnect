@@ -8,7 +8,7 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <!-- Google Fonts (Inter & Plus Jakarta Sans) -->
+    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -27,7 +27,6 @@
                             700: '#1e40af',
                             900: '#0f172a',
                             gold: '#f59e0b',
-                            accent: '#3b82f6'
                         }
                     },
                     fontFamily: {
@@ -38,7 +37,7 @@
         }
     </script>
     <style>
-        /* Modern Scrollbar */
+        /* Custom Modern Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -53,25 +52,17 @@
         ::-webkit-scrollbar-thumb:hover {
             background: rgba(156, 163, 175, 0.5);
         }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.85);
-            backdrop-filter: blur(12px);
-        }
-        .dark .glass-card {
-            background: rgba(15, 23, 42, 0.85);
-            backdrop-filter: blur(12px);
-        }
     </style>
 </head>
 <body class="h-full font-sans bg-gray-50 text-gray-900 dark:bg-slate-950 dark:text-gray-100 flex flex-col transition-colors duration-200">
 
     <!-- LOGIN / AUTH SCREEN OVERLAY -->
-    <div id="authScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-brand-900 to-indigo-950 text-white">
-        <!-- Ambient Glow -->
+    <div id="authScreen" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-brand-900 to-indigo-950 text-white overflow-y-auto">
+        <!-- Ambient Glow Elements -->
         <div class="absolute top-1/4 left-1/3 w-96 h-96 bg-blue-600/20 rounded-full blur-3xl pointer-events-none"></div>
         <div class="absolute bottom-1/4 right-1/3 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none"></div>
 
-        <div class="relative w-full max-w-md bg-white/10 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6">
+        <div class="relative w-full max-w-md bg-white/10 dark:bg-slate-900/80 backdrop-blur-xl border border-white/20 dark:border-slate-800 rounded-3xl p-8 shadow-2xl space-y-6 my-auto">
             <!-- Header Logo -->
             <div class="text-center space-y-2">
                 <div class="w-16 h-16 rounded-2xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white text-3xl font-extrabold mx-auto shadow-lg shadow-brand-500/30">
@@ -81,13 +72,45 @@
                 <p class="text-xs text-gray-300">Houston County Board of Education Unified Portal</p>
             </div>
 
+            <!-- DEBUG MODE TOGGLE BOX -->
+            <div class="p-3.5 bg-amber-500/10 border border-amber-500/30 rounded-2xl space-y-2">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center space-x-2">
+                        <i class="fa-solid fa-bug text-amber-400"></i>
+                        <span class="text-xs font-bold text-amber-300">Debug Mode (Bypass Domain Check)</span>
+                    </div>
+                    <label class="relative inline-flex items-center cursor-pointer">
+                        <input type="checkbox" id="debugToggle" class="sr-only peer" onchange="toggleDebugState()">
+                        <div class="w-9 h-5 bg-gray-700 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-amber-500"></div>
+                    </label>
+                </div>
+                <p class="text-[11px] text-gray-300 leading-tight">
+                    Enable this to test with standard <span class="text-amber-300 font-semibold">@gmail.com</span> addresses without domain rejection.
+                </p>
+                
+                <!-- Debug Role Selection -->
+                <div id="debugRoleSelector" class="hidden pt-2 border-t border-amber-500/20 flex items-center justify-between text-xs">
+                    <span class="text-gray-300 font-medium">Assign Debug Role:</span>
+                    <div class="flex items-x-3 space-x-3">
+                        <label class="flex items-center space-x-1 cursor-pointer">
+                            <input type="radio" name="debugRole" value="student" checked class="accent-amber-500">
+                            <span class="text-gray-200">Student</span>
+                        </label>
+                        <label class="flex items-center space-x-1 cursor-pointer">
+                            <input type="radio" name="debugRole" value="teacher" class="accent-amber-500">
+                            <span class="text-gray-200">Teacher</span>
+                        </label>
+                    </div>
+                </div>
+            </div>
+
             <!-- Error Banner -->
             <div id="authError" class="hidden bg-red-500/20 border border-red-500/50 text-red-200 text-xs p-3.5 rounded-xl flex items-start space-x-2">
-                <i class="fa-solid fa-circle-exclamation text-red-400 mt-0.5"></i>
+                <i class="fa-solid fa-circle-exclamation text-red-400 mt-0.5 flex-shrink-0"></i>
                 <span id="authErrorMsg">Error message here.</span>
             </div>
 
-            <!-- Auth Forms -->
+            <!-- Auth Actions -->
             <div class="space-y-4">
                 <button onclick="signInWithGoogle()" class="w-full py-3 px-4 bg-white hover:bg-gray-100 text-gray-900 font-semibold rounded-xl text-xs flex items-center justify-center space-x-3 transition shadow-sm">
                     <svg class="w-4 h-4" viewBox="0 0 24 24">
@@ -96,18 +119,18 @@
                         <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"/>
                         <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"/>
                     </svg>
-                    <span>Continue with District Google Account</span>
+                    <span>Continue with Google</span>
                 </button>
 
                 <div class="relative flex py-1 items-center">
                     <div class="flex-grow border-t border-white/10"></div>
-                    <span class="flex-shrink mx-3 text-gray-400 text-[10px] uppercase font-bold tracking-wider">or sign in with credentials</span>
+                    <span class="flex-shrink mx-3 text-gray-400 text-[10px] uppercase font-bold tracking-wider">or email login</span>
                     <div class="flex-grow border-t border-white/10"></div>
                 </div>
 
                 <form onsubmit="handleEmailAuth(event)" class="space-y-3">
                     <div>
-                        <label class="block text-[11px] font-medium text-gray-300 mb-1">District Email</label>
+                        <label class="block text-[11px] font-medium text-gray-300 mb-1">Email Address</label>
                         <input type="email" id="authEmail" required placeholder="user@hcbe.net or student@student.hcbe.net" class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
                     </div>
                     <div>
@@ -115,16 +138,16 @@
                         <input type="password" id="authPassword" required placeholder="••••••••" class="w-full bg-white/5 border border-white/10 rounded-xl px-3.5 py-2.5 text-xs text-white placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-brand-500 transition">
                     </div>
                     <button type="submit" class="w-full bg-gradient-to-r from-brand-600 to-indigo-600 hover:from-brand-500 hover:to-indigo-500 text-white font-semibold py-2.5 rounded-xl text-xs transition shadow-lg shadow-brand-600/30">
-                        Sign In / Register
+                        Sign In / Register Account
                     </button>
                 </form>
             </div>
 
-            <!-- Domain Rules Badge -->
-            <div class="p-3 bg-white/5 rounded-xl border border-white/10 text-[11px] text-gray-300 space-y-1">
-                <div class="flex items-center space-x-1.5 text-amber-400 font-semibold">
+            <!-- Domain Rules Info -->
+            <div id="domainRulesCard" class="p-3 bg-white/5 rounded-xl border border-white/10 text-[11px] text-gray-300 space-y-1">
+                <div class="flex items-center space-x-1.5 text-blue-400 font-semibold">
                     <i class="fa-solid fa-shield-halved"></i>
-                    <span>Domain Restrictions Active</span>
+                    <span>Official Domain Policy</span>
                 </div>
                 <p class="text-gray-400">• <strong class="text-white">@hcbe.net</strong>: Granted Teacher privileges.</p>
                 <p class="text-gray-400">• <strong class="text-white">@student.hcbe.net</strong>: Granted Student privileges.</p>
@@ -137,7 +160,7 @@
         
         <!-- TOP APP BAR -->
         <header class="h-16 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-4 sm:px-6 flex items-center justify-between z-10 flex-shrink-0">
-            <!-- Brand & Search -->
+            <!-- Brand & Navigation -->
             <div class="flex items-center space-x-4">
                 <div class="flex items-center space-x-3">
                     <div class="w-9 h-9 rounded-xl bg-gradient-to-tr from-brand-600 to-amber-500 flex items-center justify-center text-white text-lg font-bold shadow-md shadow-brand-500/20">
@@ -160,9 +183,8 @@
                 </nav>
             </div>
 
-            <!-- Right Profile & Utilities -->
+            <!-- Profile & Actions -->
             <div class="flex items-center space-x-3">
-                <!-- Sync Trigger -->
                 <button onclick="openSyncModal()" class="hidden md:flex items-center space-x-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 px-3 py-1.5 rounded-xl text-xs font-semibold hover:bg-emerald-100 transition">
                     <i class="fa-solid fa-arrows-rotate text-emerald-500"></i>
                     <span>Sync IC Roster</span>
@@ -190,11 +212,10 @@
         <!-- MAIN BODY CONTAINER -->
         <main class="flex-1 flex overflow-hidden relative">
 
-            <!-- ================= VIEW 1: MESSAGING PORTAL ================= -->
+            <!-- MESSAGING VIEW -->
             <section id="viewMessages" class="flex-1 flex overflow-hidden w-full">
-                <!-- Sidebar Channels / DMs -->
+                <!-- Sidebar Channels -->
                 <aside class="w-72 sm:w-80 bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-800 flex flex-col flex-shrink-0">
-                    <!-- Sidebar Header & New Chat button -->
                     <div class="p-4 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
                         <h2 class="font-bold text-sm text-gray-800 dark:text-gray-200">Conversations</h2>
                         <button onclick="openNewChatModal()" class="w-8 h-8 rounded-lg bg-brand-600 hover:bg-brand-500 text-white flex items-center justify-center transition shadow-sm" title="New Chat">
@@ -209,40 +230,38 @@
                         <button id="filterDirect" onclick="filterChats('direct')" class="flex-1 py-1 text-[11px] font-semibold rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800">DMs</button>
                     </div>
 
-                    <!-- Conversation List -->
+                    <!-- Chat Items List -->
                     <div id="chatListContainer" class="flex-1 overflow-y-auto divide-y divide-gray-50 dark:divide-slate-800/50">
-                        <!-- Dynamic Firebase Chats render here -->
+                        <!-- Dynamic Firebase Chats -->
                     </div>
                 </aside>
 
-                <!-- Active Chat Area -->
+                <!-- Message Feed Area -->
                 <div class="flex-1 flex flex-col bg-gray-50 dark:bg-slate-950 overflow-hidden">
-                    <!-- Chat Banner Bar -->
                     <div id="chatHeaderBar" class="h-14 bg-white dark:bg-slate-900 border-b border-gray-200 dark:border-slate-800 px-6 flex items-center justify-between flex-shrink-0">
                         <div class="flex items-center space-x-3">
                             <div id="activeChatIcon" class="w-8 h-8 rounded-lg bg-brand-100 text-brand-600 dark:bg-brand-950 dark:text-brand-400 flex items-center justify-center font-bold text-xs">
                                 <i class="fa-solid fa-hashtag"></i>
                             </div>
                             <div>
-                                <h3 id="activeChatTitle" class="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">Select or start a chat</h3>
+                                <h3 id="activeChatTitle" class="font-bold text-sm text-gray-800 dark:text-gray-100 leading-tight">Select or start a conversation</h3>
                                 <p id="activeChatSubtitle" class="text-[11px] text-gray-400">Choose a channel from the left sidebar</p>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Message Feed -->
                     <div id="messageFeed" class="flex-1 overflow-y-auto p-6 space-y-4">
                         <div class="h-full flex flex-col items-center justify-center text-center text-gray-400 space-y-3">
                             <div class="w-16 h-16 rounded-full bg-gray-200 dark:bg-slate-800 flex items-center justify-center text-2xl text-gray-400">
                                 <i class="fa-solid fa-comments"></i>
                             </div>
-                            <p class="text-xs">No active conversation selected.<br>Select a chat on the left or create a new group.</p>
+                            <p class="text-xs">No active channel selected.<br>Choose an existing group chat or start a direct message.</p>
                         </div>
                     </div>
 
-                    <!-- Message Input Form -->
+                    <!-- Input Box -->
                     <form onsubmit="handleSendMessage(event)" class="p-4 bg-white dark:bg-slate-900 border-t border-gray-200 dark:border-slate-800 flex items-center space-x-3 flex-shrink-0">
-                        <input type="text" id="messageInput" disabled placeholder="Type a message to HCBE members..." class="flex-1 bg-gray-100 dark:bg-slate-800 border-0 rounded-xl px-4 py-3 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white transition">
+                        <input type="text" id="messageInput" disabled placeholder="Type a message..." class="flex-1 bg-gray-100 dark:bg-slate-800 border-0 rounded-xl px-4 py-3 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white transition">
                         <button type="submit" id="sendMsgBtn" disabled class="bg-brand-600 hover:bg-brand-500 disabled:opacity-50 text-white font-semibold px-5 py-3 rounded-xl text-xs flex items-center space-x-2 transition shadow-md shadow-brand-600/20">
                             <span>Send</span>
                             <i class="fa-solid fa-paper-plane text-xs"></i>
@@ -251,33 +270,30 @@
                 </div>
             </section>
 
-
-            <!-- ================= VIEW 2: INFINITE CAMPUS ACADEMICS ================= -->
+            <!-- ACADEMICS VIEW -->
             <section id="viewAcademics" class="hidden flex-1 p-6 overflow-y-auto">
                 <div class="max-w-5xl mx-auto space-y-6">
-                    <!-- Top Academic Banner -->
                     <div class="p-6 rounded-3xl bg-gradient-to-r from-slate-900 via-brand-950 to-slate-900 text-white shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-4 border border-white/10">
                         <div class="space-y-1">
                             <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold tracking-wide uppercase bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
-                                Infinite Campus Realtime Bridge
+                                Infinite Campus Bridge
                             </span>
                             <h2 class="text-2xl font-extrabold tracking-tight">Academic Overview</h2>
                             <p class="text-xs text-gray-300">Synchronized gradebook and attendance entries for HCBE District.</p>
                         </div>
                         <button onclick="openSyncModal()" class="px-4 py-2.5 bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-bold text-xs rounded-xl transition shadow-lg shadow-emerald-500/20 flex items-center space-x-2">
                             <i class="fa-solid fa-sync"></i>
-                            <span>Import / Update Roster</span>
+                            <span>Import IC Data</span>
                         </button>
                     </div>
 
-                    <!-- Key Metric Cards -->
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                         <div class="p-5 bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 shadow-sm flex items-center space-x-4">
                             <div class="w-12 h-12 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-brand-600 dark:text-brand-400 flex items-center justify-center text-xl font-extrabold">
                                 <i class="fa-solid fa-award"></i>
                             </div>
                             <div>
-                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Cumulative GPA</p>
+                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">GPA</p>
                                 <h3 id="statGpa" class="text-2xl font-extrabold text-gray-900 dark:text-white">--</h3>
                             </div>
                         </div>
@@ -287,7 +303,7 @@
                                 <i class="fa-solid fa-clipboard-user"></i>
                             </div>
                             <div>
-                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Attendance Rate</p>
+                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Attendance</p>
                                 <h3 id="statAttendance" class="text-2xl font-extrabold text-gray-900 dark:text-white">--</h3>
                             </div>
                         </div>
@@ -297,17 +313,15 @@
                                 <i class="fa-solid fa-user-clock"></i>
                             </div>
                             <div>
-                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Unexcused Absences</p>
+                                <p class="text-[11px] font-bold text-gray-400 uppercase tracking-wider">Absences</p>
                                 <h3 id="statAbsences" class="text-2xl font-extrabold text-gray-900 dark:text-white">--</h3>
                             </div>
                         </div>
                     </div>
 
-                    <!-- Enrolled Courses Table -->
                     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 overflow-hidden shadow-sm">
                         <div class="p-5 border-b border-gray-100 dark:border-slate-800 flex items-center justify-between">
-                            <h3 class="font-bold text-sm text-gray-900 dark:text-white">Enrolled Class Gradebook</h3>
-                            <span class="text-xs text-gray-400">Fall 2026 Term</span>
+                            <h3 class="font-bold text-sm text-gray-900 dark:text-white">Enrolled Course Gradebook</h3>
                         </div>
                         <div class="overflow-x-auto">
                             <table class="w-full text-left text-xs">
@@ -315,14 +329,14 @@
                                     <tr>
                                         <th class="py-3 px-6">Course Name</th>
                                         <th class="py-3 px-6">Instructor</th>
-                                        <th class="py-3 px-6">Numeric Grade</th>
-                                        <th class="py-3 px-6">Letter Grade</th>
+                                        <th class="py-3 px-6">Score</th>
+                                        <th class="py-3 px-6">Grade</th>
                                         <th class="py-3 px-6 text-right">Action</th>
                                     </tr>
                                 </thead>
                                 <tbody id="gradeTableBody" class="divide-y divide-gray-100 dark:divide-slate-800/60">
                                     <tr>
-                                        <td colspan="5" class="py-8 text-center text-gray-400">No Infinite Campus roster imported yet. Click "Import / Update Roster" to load student grades.</td>
+                                        <td colspan="5" class="py-8 text-center text-gray-400">Click "Sync IC Roster" to import course grades.</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -331,20 +345,13 @@
                 </div>
             </section>
 
-
-            <!-- ================= VIEW 3: SCHEDULE ================= -->
+            <!-- SCHEDULE VIEW -->
             <section id="viewSchedule" class="hidden flex-1 p-6 overflow-y-auto">
                 <div class="max-w-4xl mx-auto space-y-6">
-                    <div class="flex items-center justify-between">
-                        <div>
-                            <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white">Daily Class Schedule</h2>
-                            <p class="text-xs text-gray-400">Synced directly with Infinite Campus bell schedule</p>
-                        </div>
-                    </div>
-
+                    <h2 class="text-2xl font-extrabold text-gray-900 dark:text-white">Daily Class Timeline</h2>
                     <div id="scheduleList" class="space-y-3">
                         <div class="p-8 text-center bg-white dark:bg-slate-900 rounded-2xl border border-gray-200 dark:border-slate-800 text-gray-400 text-xs">
-                            No schedule data loaded. Sync Infinite Campus data to view your daily timeline.
+                            No schedule loaded. Sync Infinite Campus data to load periods.
                         </div>
                     </div>
                 </div>
@@ -352,71 +359,40 @@
         </main>
     </div>
 
-    <!-- MODAL: INFINITE CAMPUS SYNC -->
+    <!-- MODAL: SYNC -->
     <div id="syncModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 border border-gray-200 dark:border-slate-800 shadow-2xl space-y-5">
             <div class="flex justify-between items-center">
-                <div class="flex items-center space-x-2">
-                    <i class="fa-solid fa-arrows-rotate text-emerald-500 text-lg"></i>
-                    <h3 class="font-bold text-base text-gray-900 dark:text-white">Infinite Campus Roster Sync</h3>
-                </div>
-                <button onclick="closeSyncModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <h3 class="font-bold text-base text-gray-900 dark:text-white">Infinite Campus Roster Sync</h3>
+                <button onclick="closeSyncModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-            
-            <p class="text-xs text-gray-500 dark:text-gray-400 leading-relaxed">
-                Import official HCBE Infinite Campus JSON data or load the standard school template to update grades and teacher directories.
-            </p>
-
-            <div class="space-y-3">
-                <button onclick="loadPresetICData()" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-xs transition flex items-center justify-center space-x-2 shadow-md shadow-emerald-600/20">
-                    <i class="fa-solid fa-bolt"></i>
-                    <span>Load HCBE Sample Roster & Grades</span>
-                </button>
-
-                <div class="relative flex py-1 items-center">
-                    <div class="flex-grow border-t border-gray-200 dark:border-slate-800"></div>
-                    <span class="flex-shrink mx-3 text-gray-400 text-[10px] uppercase font-bold">or custom JSON</span>
-                    <div class="flex-grow border-t border-gray-200 dark:border-slate-800"></div>
-                </div>
-
-                <textarea id="customJsonInput" rows="3" placeholder='{"gpa": "3.95", "attendance": "99%", "courses": [...]}' class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-xs focus:ring-2 focus:ring-emerald-500 focus:outline-none dark:text-white font-mono"></textarea>
-                
-                <button onclick="processCustomSync()" class="w-full py-2.5 bg-gray-900 dark:bg-slate-800 hover:bg-gray-800 dark:hover:bg-slate-700 text-white font-semibold rounded-xl text-xs transition">
-                    Parse & Import JSON
-                </button>
-            </div>
+            <button onclick="loadPresetICData()" class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold rounded-xl text-xs transition flex items-center justify-center space-x-2">
+                <i class="fa-solid fa-bolt"></i>
+                <span>Load Sample Roster & Grades</span>
+            </button>
         </div>
     </div>
 
-    <!-- MODAL: NEW CHAT / GROUP -->
+    <!-- MODAL: NEW CHAT -->
     <div id="newChatModal" class="hidden fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4">
         <div class="w-full max-w-md bg-white dark:bg-slate-900 rounded-3xl p-6 border border-gray-200 dark:border-slate-800 shadow-2xl space-y-5">
             <div class="flex justify-between items-center">
-                <h3 class="font-bold text-base text-gray-900 dark:text-white">Create Communication Channel</h3>
-                <button onclick="closeNewChatModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white">
-                    <i class="fa-solid fa-xmark"></i>
-                </button>
+                <h3 class="font-bold text-base text-gray-900 dark:text-white">Create Channel</h3>
+                <button onclick="closeNewChatModal()" class="text-gray-400 hover:text-gray-600 dark:hover:text-white"><i class="fa-solid fa-xmark"></i></button>
             </div>
-
             <div class="space-y-4">
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Channel Type</label>
-                    <select id="newChatType" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white">
-                        <option value="group">Group Channel (e.g. Class, PTSO)</option>
-                        <option value="direct">Direct Message Channel</option>
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Type</label>
+                    <select id="newChatType" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-xs dark:text-white">
+                        <option value="group">Group Channel</option>
+                        <option value="direct">Direct Message</option>
                     </select>
                 </div>
-
                 <div>
-                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Channel Title</label>
-                    <input type="text" id="newChatName" placeholder="e.g. AP Physics Group Chat" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-xs focus:ring-2 focus:ring-brand-500 focus:outline-none dark:text-white">
+                    <label class="block text-xs font-semibold text-gray-700 dark:text-gray-300 mb-1">Channel Name</label>
+                    <input type="text" id="newChatName" placeholder="e.g. AP Physics Group" class="w-full bg-gray-50 dark:bg-slate-800 border border-gray-200 dark:border-slate-700 rounded-xl p-3 text-xs dark:text-white">
                 </div>
-
-                <button onclick="createChatChannel()" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-xs transition shadow-md shadow-brand-600/20">
-                    Create Channel
-                </button>
+                <button onclick="createChatChannel()" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-semibold rounded-xl text-xs transition">Create</button>
             </div>
         </div>
     </div>
@@ -425,9 +401,9 @@
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
         import { getDatabase, ref, push, onValue, set, serverTimestamp, get } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
-        import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+        import { getAuth, signInWithPopup, signInWithRedirect, getRedirectResult, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-        // Firebase Credentials Config
+        // Provided Firebase Config
         const firebaseConfig = {
             apiKey: "AIzaSyD8Kpy3rIurMoplJOAfGlPUm6r8qbF7hJ8",
             authDomain: "openverse-sd6r4.firebaseapp.com",
@@ -445,34 +421,42 @@
 
         window.db = db;
         window.auth = auth;
-
         window.currentUser = null;
         window.currentChatId = null;
         window.conversationsData = {};
         window.activeFilter = 'all';
 
-        // Sample Infinite Campus Local State
-        window.icData = {
-            gpa: '--',
-            attendance: '--',
-            absences: '--',
-            courses: []
+        // Toggle Debug Mode Selector
+        window.toggleDebugState = function() {
+            const isDebug = document.getElementById('debugToggle').checked;
+            const selector = document.getElementById('debugRoleSelector');
+            if (isDebug) {
+                selector.classList.remove('hidden');
+            } else {
+                selector.classList.add('hidden');
+            }
         };
 
-        // Dark / Light Theme Toggle
         window.toggleTheme = function() {
             document.documentElement.classList.toggle('dark');
         };
 
-        // Domain Access Rules Logic
+        // Domain & Debug Validation
         function validateDomain(email) {
-            if (!email) return { allowed: false, role: null };
-            const lower = email.toLowerCase().trim();
+            const isDebug = document.getElementById('debugToggle').checked;
+            const lower = (email || '').toLowerCase().trim();
+
+            if (isDebug) {
+                const selectedRole = document.querySelector('input[name="debugRole"]:checked')?.value || 'student';
+                return { allowed: true, role: selectedRole + ' (debug)' };
+            }
+
             if (lower.endsWith('@student.hcbe.net')) {
                 return { allowed: true, role: 'student' };
             } else if (lower.endsWith('@hcbe.net')) {
                 return { allowed: true, role: 'teacher' };
             }
+
             return { allowed: false, role: null };
         }
 
@@ -482,17 +466,16 @@
             errDiv.classList.remove('hidden');
         }
 
-        // Auth Observer
+        // Handle Auth State Changes
         onAuthStateChanged(auth, async (user) => {
             if (user) {
                 const check = validateDomain(user.email);
                 if (!check.allowed) {
                     await signOut(auth);
-                    showAuthError("Access Denied: Only @hcbe.net (Teachers) and @student.hcbe.net (Students) domain emails are authorized.");
+                    showAuthError("Access Denied: Only @hcbe.net and @student.hcbe.net domain emails permitted. Enable Debug Mode to test with Gmail.");
                     return;
                 }
 
-                // Get or Create User Data
                 const userRef = ref(db, `users/${user.uid}`);
                 const snap = await get(userRef);
                 let userData = snap.val();
@@ -509,8 +492,6 @@
                 }
 
                 window.currentUser = userData;
-
-                // UI State Update
                 document.getElementById('authScreen').classList.add('hidden');
                 document.getElementById('navUserName').innerText = userData.displayName;
                 document.getElementById('navUserRole').innerText = userData.role;
@@ -522,13 +503,17 @@
             }
         });
 
-        // Google Sign In
+        // Google Authentication
         window.signInWithGoogle = async function() {
             try {
                 document.getElementById('authError').classList.add('hidden');
                 await signInWithPopup(auth, googleProvider);
             } catch (err) {
-                showAuthError(err.message || "Google Authentication failed.");
+                if (err.code === 'auth/popup-blocked' || err.code === 'auth/popup-closed-by-user') {
+                    signInWithRedirect(auth, googleProvider);
+                } else {
+                    showAuthError(err.message || "Google Authentication failed.");
+                }
             }
         };
 
@@ -541,7 +526,7 @@
 
             const check = validateDomain(email);
             if (!check.allowed) {
-                showAuthError("Access Denied: Only @hcbe.net and @student.hcbe.net emails permitted.");
+                showAuthError("Access Denied: Email domain must be @hcbe.net or @student.hcbe.net unless Debug Mode is ON.");
                 return;
             }
 
@@ -564,25 +549,22 @@
             signOut(auth);
         };
 
-        // Realtime Conversation Observer
+        // Realtime Messages & Conversations
         function listenToConversations() {
-            const chatsRef = ref(db, 'hcbe_chats');
-            onValue(chatsRef, (snapshot) => {
+            onValue(ref(db, 'hcbe_chats'), (snapshot) => {
                 window.conversationsData = snapshot.val() || {};
                 renderChatList();
             });
         }
 
-        // Render Conversation List Sidebar
         window.renderChatList = function() {
             const container = document.getElementById('chatListContainer');
             container.innerHTML = '';
-
             const chats = window.conversationsData || {};
             const keys = Object.keys(chats);
 
             if (keys.length === 0) {
-                container.innerHTML = `<div class="p-6 text-center text-xs text-gray-400">No channels yet. Click + to create one!</div>`;
+                container.innerHTML = `<div class="p-6 text-center text-xs text-gray-400">No active channels. Click + to create one.</div>`;
                 return;
             }
 
@@ -592,18 +574,15 @@
                 if (window.activeFilter === 'direct' && chat.type !== 'direct') return;
 
                 const isSelected = id === window.currentChatId;
-
                 const div = document.createElement('div');
                 div.className = `p-4 cursor-pointer transition flex items-center space-x-3 hover:bg-gray-50 dark:hover:bg-slate-800/60 ${
                     isSelected ? 'bg-brand-50/80 dark:bg-brand-950/40 border-l-4 border-brand-600' : ''
                 }`;
                 div.onclick = () => selectChat(id);
 
-                const icon = chat.type === 'direct' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-hashtag"></i>';
-
                 div.innerHTML = `
                     <div class="w-9 h-9 rounded-xl ${chat.type === 'direct' ? 'bg-amber-100 text-amber-700 dark:bg-amber-950 dark:text-amber-300' : 'bg-brand-100 text-brand-600 dark:bg-brand-950 dark:text-brand-300'} flex items-center justify-center font-bold text-xs flex-shrink-0">
-                        ${icon}
+                        <i class="fa-solid ${chat.type === 'direct' ? 'fa-user' : 'fa-hashtag'}"></i>
                     </div>
                     <div class="flex-1 min-w-0">
                         <h4 class="font-bold text-xs text-gray-900 dark:text-gray-100 truncate">${chat.title}</h4>
@@ -614,26 +593,13 @@
             });
         };
 
-        window.filterChats = function(type) {
-            window.activeFilter = type;
-            ['All', 'Groups', 'Direct'].forEach(t => {
-                const btn = document.getElementById(`filter${t}`);
-                btn.className = "flex-1 py-1 text-[11px] font-semibold rounded-lg text-gray-500 hover:bg-gray-100 dark:hover:bg-slate-800";
-            });
-            const activeBtn = document.getElementById(`filter${type.charAt(0).toUpperCase() + type.slice(1)}`);
-            activeBtn.className = "flex-1 py-1 text-[11px] font-bold rounded-lg bg-gray-100 dark:bg-slate-800 text-gray-800 dark:text-gray-200";
-            renderChatList();
-        };
-
         window.selectChat = function(chatId) {
             window.currentChatId = chatId;
             const chat = window.conversationsData[chatId];
             if (!chat) return;
 
             document.getElementById('activeChatTitle').innerText = chat.title;
-            document.getElementById('activeChatSubtitle').innerText = chat.type === 'direct' ? 'Direct Message Channel' : 'Group Channel';
-            document.getElementById('activeChatIcon').innerHTML = chat.type === 'direct' ? '<i class="fa-solid fa-user"></i>' : '<i class="fa-solid fa-hashtag"></i>';
-
+            document.getElementById('activeChatSubtitle').innerText = chat.type === 'direct' ? 'Direct Channel' : 'Group Channel';
             document.getElementById('messageInput').disabled = false;
             document.getElementById('sendMsgBtn').disabled = false;
 
@@ -642,21 +608,19 @@
         };
 
         function loadMessages(chatId) {
-            const msgsRef = ref(db, `hcbe_messages/${chatId}`);
-            onValue(msgsRef, (snap) => {
+            onValue(ref(db, `hcbe_messages/${chatId}`), (snap) => {
                 const feed = document.getElementById('messageFeed');
                 feed.innerHTML = '';
-
                 const messages = snap.val();
+
                 if (!messages) {
-                    feed.innerHTML = `<div class="text-center text-gray-400 text-xs my-auto">No messages yet. Send the first message!</div>`;
+                    feed.innerHTML = `<div class="text-center text-gray-400 text-xs my-auto">No messages in this channel yet.</div>`;
                     return;
                 }
 
                 Object.keys(messages).forEach(k => {
                     const m = messages[k];
                     const isMe = window.currentUser && m.senderId === window.currentUser.uid;
-
                     const div = document.createElement('div');
                     div.className = `flex flex-col ${isMe ? 'items-end' : 'items-start'}`;
 
@@ -672,7 +636,6 @@
                     `;
                     feed.appendChild(div);
                 });
-
                 feed.scrollTop = feed.scrollHeight;
             });
         }
@@ -680,14 +643,11 @@
         window.handleSendMessage = function(e) {
             e.preventDefault();
             if (!window.currentChatId || !window.currentUser) return;
-
             const input = document.getElementById('messageInput');
             const text = input.value.trim();
             if (!text) return;
 
-            const msgsRef = ref(db, `hcbe_messages/${window.currentChatId}`);
-            const newMsgRef = push(msgsRef);
-
+            const newMsgRef = push(ref(db, `hcbe_messages/${window.currentChatId}`));
             set(newMsgRef, {
                 senderId: window.currentUser.uid,
                 senderName: window.currentUser.displayName,
@@ -700,116 +660,46 @@
             input.value = '';
         };
 
-        window.startDirectDM = function(teacherName) {
-            switchTab('messages');
-            const chatId = `dm_${teacherName.replace(/\s+/g, '_').toLowerCase()}`;
-            set(ref(db, `hcbe_chats/${chatId}`), {
-                title: `Teacher: ${teacherName}`,
-                type: 'direct',
-                lastMessage: 'DM started',
-                updatedAt: Date.now()
-            });
-            selectChat(chatId);
-        };
-
-        // Navigation Tab Logic
         window.switchTab = function(tab) {
             ['messages', 'academics', 'schedule'].forEach(t => {
                 document.getElementById(`view${t.charAt(0).toUpperCase() + t.slice(1)}`).classList.add('hidden');
                 document.getElementById(`tabNav${t.charAt(0).toUpperCase() + t.slice(1)}`).className = "px-3 py-1.5 rounded-lg text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition";
             });
-
             document.getElementById(`view${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.remove('hidden');
             document.getElementById(`tabNav${tab.charAt(0).toUpperCase() + tab.slice(1)}`).className = "px-3 py-1.5 rounded-lg bg-white dark:bg-slate-700 shadow-sm text-gray-900 dark:text-white transition";
         };
 
-        // Infinite Campus Mock Data Processing
+        // IC Presets
         window.loadPresetICData = function() {
-            window.icData = {
-                gpa: '3.94',
-                attendance: '98.8%',
-                absences: '1 Day',
-                courses: [
-                    { name: 'AP Physics 1', teacher: 'Dr. Robert Vance', period: '1st Period', score: '96%', letter: 'A' },
-                    { name: 'Honors English Literature', teacher: 'Mrs. Elena Rostova', period: '2nd Period', score: '92%', letter: 'A-' },
-                    { name: 'AP Calculus BC', teacher: 'Mr. Marcus Brody', period: '3rd Period', score: '98%', letter: 'A+' },
-                    { name: 'US History Honors', teacher: 'Coach Sarah Miller', period: '4th Period', score: '94%', letter: 'A' }
-                ]
-            };
-            renderAcademics();
-            renderSchedule();
+            document.getElementById('statGpa').innerText = '3.94';
+            document.getElementById('statAttendance').innerText = '98.8%';
+            document.getElementById('statAbsences').innerText = '1 Day';
+
+            const tbody = document.getElementById('gradeTableBody');
+            tbody.innerHTML = `
+                <tr class="hover:bg-gray-50 dark:hover:bg-slate-800/40">
+                    <td class="py-3 px-6 font-bold text-gray-900 dark:text-white">AP Physics 1</td>
+                    <td class="py-3 px-6 text-gray-400">Dr. Robert Vance</td>
+                    <td class="py-3 px-6 font-bold">96%</td>
+                    <td class="py-3 px-6"><span class="px-2 py-0.5 text-[10px] font-bold bg-emerald-100 text-emerald-800 rounded">A</span></td>
+                    <td class="py-3 px-6 text-right"><button onclick="startDirectDM('Dr. Vance')" class="px-2.5 py-1 bg-brand-600 text-white text-[11px] rounded-lg">DM Teacher</button></td>
+                </tr>
+            `;
             closeSyncModal();
         };
 
-        window.processCustomSync = function() {
-            const raw = document.getElementById('customJsonInput').value;
-            if (!raw) return loadPresetICData();
-            try {
-                const parsed = JSON.parse(raw);
-                if (parsed.gpa) window.icData.gpa = parsed.gpa;
-                if (parsed.attendance) window.icData.attendance = parsed.attendance;
-                if (parsed.courses) window.icData.courses = parsed.courses;
-                renderAcademics();
-                renderSchedule();
-                closeSyncModal();
-            } catch (e) {
-                alert('Invalid JSON format.');
-            }
+        window.startDirectDM = function(name) {
+            switchTab('messages');
+            const chatId = `dm_${name.replace(/\s+/g, '_').toLowerCase()}`;
+            set(ref(db, `hcbe_chats/${chatId}`), {
+                title: `Teacher: ${name}`,
+                type: 'direct',
+                lastMessage: 'Direct chat initiated.',
+                updatedAt: Date.now()
+            });
+            selectChat(chatId);
         };
 
-        function renderAcademics() {
-            document.getElementById('statGpa').innerText = window.icData.gpa;
-            document.getElementById('statAttendance').innerText = window.icData.attendance;
-            document.getElementById('statAbsences').innerText = window.icData.absences;
-
-            const tbody = document.getElementById('gradeTableBody');
-            tbody.innerHTML = '';
-
-            window.icData.courses.forEach(c => {
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-gray-50 dark:hover:bg-slate-800/40 transition";
-                tr.innerHTML = `
-                    <td class="py-3.5 px-6 font-bold text-gray-900 dark:text-white">${c.name}</td>
-                    <td class="py-3.5 px-6 text-gray-500 dark:text-gray-400">${c.teacher}</td>
-                    <td class="py-3.5 px-6 font-bold text-gray-800 dark:text-gray-200">${c.score}</td>
-                    <td class="py-3.5 px-6">
-                        <span class="px-2.5 py-0.5 text-[11px] font-bold rounded-md bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-300">
-                            ${c.letter}
-                        </span>
-                    </td>
-                    <td class="py-3.5 px-6 text-right">
-                        <button onclick="startDirectDM('${c.teacher}')" class="px-3 py-1.5 bg-brand-600 hover:bg-brand-500 text-white rounded-lg font-semibold text-[11px] transition shadow-xs">
-                            <i class="fa-solid fa-comment-dots mr-1"></i> DM Teacher
-                        </button>
-                    </td>
-                `;
-                tbody.appendChild(tr);
-            });
-        }
-
-        function renderSchedule() {
-            const container = document.getElementById('scheduleList');
-            container.innerHTML = '';
-            window.icData.courses.forEach((c, idx) => {
-                const card = document.createElement('div');
-                card.className = "p-4 bg-white dark:bg-slate-900 border border-gray-200 dark:border-slate-800 rounded-2xl flex items-center justify-between shadow-xs";
-                card.innerHTML = `
-                    <div class="flex items-center space-x-4">
-                        <div class="w-10 h-10 rounded-xl bg-brand-50 dark:bg-brand-950 text-brand-600 dark:text-brand-400 font-bold flex items-center justify-center text-xs">
-                            ${idx + 1}
-                        </div>
-                        <div>
-                            <h4 class="font-bold text-sm text-gray-900 dark:text-white">${c.name}</h4>
-                            <p class="text-xs text-gray-400">${c.period} • Instructor: ${c.teacher}</p>
-                        </div>
-                    </div>
-                    <span class="text-xs font-semibold px-3 py-1 bg-gray-100 dark:bg-slate-800 rounded-lg text-gray-600 dark:text-gray-300">Active</span>
-                `;
-                container.appendChild(card);
-            });
-        }
-
-        // Modals
         window.openSyncModal = function() { document.getElementById('syncModal').classList.remove('hidden'); };
         window.closeSyncModal = function() { document.getElementById('syncModal').classList.add('hidden'); };
         window.openNewChatModal = function() { document.getElementById('newChatModal').classList.remove('hidden'); };
@@ -819,15 +709,13 @@
             const type = document.getElementById('newChatType').value;
             const name = document.getElementById('newChatName').value.trim();
             if (!name) return;
-
-            const chatId = `custom_${type}_${Date.now()}`;
+            const chatId = `custom_${Date.now()}`;
             set(ref(db, `hcbe_chats/${chatId}`), {
                 title: name,
                 type: type,
                 lastMessage: 'Channel initialized.',
                 updatedAt: Date.now()
             });
-
             closeNewChatModal();
             selectChat(chatId);
         };
